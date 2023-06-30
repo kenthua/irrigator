@@ -16,21 +16,19 @@ relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
 
 def irrigate():
     try:
-        print("water on")
+        print("water on" + str(relay.value))
         relay.on() 
-        print(relay.value)
         time.sleep(duration)
-        print("water off")
+        print("water off" + str(relay.value))
         relay.off()
-        print(relay.value)
     except GPIOZeroError:
-        print('A GPIO Zero error occurred')    
-
+        print('A GPIO Zero error occurred')
+        relay.off()
+    
 # set the schedule
 schedule.every().monday.at(time1).do(irrigate)
 schedule.every().thursday.at(time1).do(irrigate)
 schedule.every().saturday.at(time1).do(irrigate)
-schedule.every().friday.at(time3).do(irrigate)
 
 while True:
     schedule.run_pending()
