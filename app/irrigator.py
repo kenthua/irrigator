@@ -8,7 +8,7 @@ RELAY_PIN = 23
 time1 = "06:30:00"
 time2 = "20:30:00"
 time3 = "03:08:10"
-duration = 60
+duration = 45
 dt_format = "%Y-%m-%d %H:%M:%S"
 
 # Triggered by the output pin going high: active_hgh=False
