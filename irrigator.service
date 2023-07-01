@@ -1,0 +1,17 @@
+[Unit]
+Description=Irrigator service
+After=multi-user.target
+StartLimitIntervalSec=30
+StartLimitBurst=2
+[Service]
+Type=simple
+Restart=always
+RestartSec=30s
+User=pi
+ExecStart=/usr/bin/python3 /home/pi/app/irrigator.py
+[Install]
+WantedBy=multi-user.target
+# /etc/systemd/system/irrigator.service 
+# systemctl daemon-reload
+# systemctl enable irrigator
+# systemctl start irrigator

@@ -6,16 +6,16 @@ import datetime
 #RELAY_PIN = "BOARD16"
 RELAY_PIN = 23
 time1 = "06:30:00"
-time2 = "21:00:00"
+time2 = "20:30:00"
 time3 = "03:08:10"
-duration = 10
+duration = 120
 dt_format = "%Y-%m-%d %H:%M:%S"
 
-# Triggered by the output pin going high: active_hgh=True
+# Triggered by the output pin going high: active_hgh=False
 # Initially off: initial_value=False
-
 relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
 
+# turn the relay on and off
 def irrigate():
     try:
         print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
@@ -28,9 +28,9 @@ def irrigate():
         relay.off()
     
 # set the schedule
-schedule.every().monday.at(time1).do(irrigate)
-schedule.every().thursday.at(time1).do(irrigate)
-schedule.every().saturday.at(time1).do(irrigate)
+schedule.every().monday.at(time2).do(irrigate)
+schedule.every().wednesday.at(time2).do(irrigate)
+schedule.every().saturday.at(time2).do(irrigate)
 
 while True:
     schedule.run_pending()
