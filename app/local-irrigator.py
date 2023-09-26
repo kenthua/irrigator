@@ -58,7 +58,7 @@ def irrigate():
             print("rain probability")
             fileStatus = "|| [Rain " + str(precipitation) + "] " + datetime.datetime.now().strftime(dt_format)
         file = open(filePath, "a")
-        file.write(fileStatus)
+        file.write(fileStatus + "\n")
         file.close()          
     except GPIOZeroError:
         print('A GPIO Zero error occurred')
