@@ -19,8 +19,8 @@ filePath = "/tmp/irrigate.out"
 # weather
 owm = pyowm.OWM(os.environ["OWM_API_KEY"])
 weather_mgr = owm.weather_manager()
-lat = os.environ["LOCATION_LAT"]
-lon = os.environ["LOCATION_LON"]
+lat = float(os.environ["LOCATION_LAT"])
+lon = float(os.environ["LOCATION_LON"])
 
 # Triggered by the output pin going high: active_hgh=False
 # Initially off: initial_value=False
