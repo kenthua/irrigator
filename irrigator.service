@@ -7,6 +7,9 @@ StartLimitBurst=2
 Type=simple
 Restart=always
 RestartSec=30s
+Environment=OWM_API_KEY={{ OWM_API_KEY }}
+Environment=LOCATION_LAT={{ LOCATION_LAT }}
+Environment=LOCATION_LON={{ LOCATION_LON }}
 User=pi
 ExecStart=/usr/bin/python3 /home/pi/app/irrigator.py
 [Install]
