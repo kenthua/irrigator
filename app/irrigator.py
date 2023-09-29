@@ -41,25 +41,27 @@ def irrigate():
 
     precipitation = convertPrecipitation(weather.precipitation_probability)
     yesterdayPrecipitation = convertPrecipitation(weatherYesterday.precipitation_probability)
+    print("T: " + str(precipitation), flush=True)
+    print("Y: " + str(yesterdayPrecipitation), flush=True)
 
     try:
         fileStatus = ""
         if (precipitation <= 0.4 and yesterdayPrecipitation < 1.0): 
-            print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
+            print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
             relay.on()
             fileStatus = "|| [Rain " + str(precipitation) + "] " + datetime.datetime.now().strftime(dt_format)
             time.sleep(duration)
-            print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
+            print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
             relay.off()
         else:
-            print("rain probability " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
+            print("rain probability " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
             fileStatus = "|| [Rain " + str(precipitation) + "] " + datetime.datetime.now().strftime(dt_format)
         
         file = open(filePath, "a")
         file.write(fileStatus + "\n")
         file.close()
     except GPIOZeroError:
-        print('A GPIO Zero error occurred')
+        print('A GPIO Zero error occurred', flush=True)
         relay.off()
     
 # set the schedule
