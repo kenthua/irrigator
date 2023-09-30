@@ -11,6 +11,7 @@ Environment=OWM_API_KEY={{ OWM_API_KEY }}
 Environment=LOCATION_LAT={{ LOCATION_LAT }}
 Environment=LOCATION_LON={{ LOCATION_LON }}
 User=pi
+WorkingDirectory=/home/pi/app
 ExecStart=/usr/bin/python3 /home/pi/app/irrigator.py
 [Install]
 WantedBy=multi-user.target

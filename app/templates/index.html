@@ -9,7 +9,9 @@
             <br>
             <button type="submit" class="block_red" name="i-action" id="off" value="off">Off</button>
             <br>
-            Currently: {{ status }}
+            Weather: Precipitation Today {{ output.weather.precipitation }} | Yesterday {{ output.weather.yesterdayPrecipitation }}
+            <br>
+            Currently: {{ output.status }}
         </form>
 </body>
 </html>
