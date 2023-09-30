@@ -30,13 +30,14 @@ def api():
             "history": history_list
         }
         json_output = json.dumps(output, indent=2)
-        print(json_output)
+        print(json_output, flush=True)
 
     return json_output
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
     try:
+        status = ""
         output = {
             "status": str(relay.value),
             "weather": {
@@ -49,15 +50,15 @@ def index():
             if request.form['i-action']  == 'on':
                 relay.on()
                 output.update(status = "on")
-                print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
+                print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
             elif request.form['i-action']  == 'off':
                 relay.off()
                 output.update(status = "off")
-                print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
+                print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
             else:
                 relay.off()
                 output.update(status = "off")
-                print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
+                print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
         elif request.method == 'GET':
             if(os.path.isfile(filePath)):
                 file = open("/tmp/irrigate.out", "r")
@@ -68,7 +69,7 @@ def index():
             return render_template('index.html', output=output)
         return render_template("index.html", output=output)
     except GPIOZeroError:
-        print('A GPIO Zero error occurred')
+        print('A GPIO Zero error occurred', flush=True)
         relay.off()
 
     return render_template("index.html", output=output)
