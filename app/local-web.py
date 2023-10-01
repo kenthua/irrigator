@@ -64,8 +64,7 @@ def index():
     elif request.method == 'GET':
         if(os.path.isfile(filePath)):
             file = open("/tmp/irrigate.out", "r")
-            status = str(output.get(status)) + "|" + file.read()
-            output.update(status = status)
+            output.update(history = file.read())
             file.close()
             
         return render_template('index.html', output=output)
