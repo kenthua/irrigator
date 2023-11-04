@@ -43,7 +43,8 @@ def index():
         "status": "0",
         "weather": {
             "precipitation": weather.precipitation(),
-            "yesterdayPrecipitation": weather.yesterdayPrecipitation()
+            "yesterdayPrecipitation": weather.yesterdayPrecipitation(),
+            "enoughPrecipitation": weather.enoughPrecipitation()            
         }
     }
     
