@@ -31,7 +31,7 @@ def irrigate():
         #print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
         #relay.on()
         fileStatus = ""
-        if (precipitation <= 0.4 and yesterdayPrecipitation < 1.0): 
+        if (not weather.enoughPrecipitation()): 
             print("on", flush=True)
             fileStatus = "|| [Rain " + str(precipitation) + "] " + datetime.datetime.now().strftime(dt_format)
             time.sleep(duration)

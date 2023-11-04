@@ -19,14 +19,6 @@ weather = Weather()
 # Initially off: initial_value=False
 relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
 
-def convertPrecipitation(value):
-    precipitation = 0.0
-    if value == None:
-        precipitation = 0.0
-    else:
-        precipitation = value
-    return precipitation    
-
 # turn the relay on and off
 def irrigate():
     precipitation = weather.precipitation()
@@ -36,7 +28,7 @@ def irrigate():
 
     try:
         fileStatus = ""
-        if (precipitation <= 0.4 and yesterdayPrecipitation < 1.0): 
+        if (not weather.enoughPrecipitation()): 
             print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
             relay.on()
             fileStatus = "|| [Rain " + str(precipitation) + "] " + datetime.datetime.now().strftime(dt_format)

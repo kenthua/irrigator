@@ -28,6 +28,15 @@ class Weather:
         yesterdayPrecipitation = Weather.convert_precipitation(weatherYesterday.precipitation_probability)
         return yesterdayPrecipitation
 
+
+    def enoughPrecipitation(self):
+        status = False
+        if(self.precipitation() <= 0.4 and self.yesterdayPrecipitation() < 1.0):
+            status = False
+        else:
+            status = True
+        return status
+
     @staticmethod
     def forecast_precipitation(weathers):
         """
