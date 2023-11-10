@@ -2,7 +2,6 @@ import gpiozero
 import time
 import schedule
 import datetime
-from weather import *
 
 #RELAY_PIN = "BOARD16"
 RELAY_PIN = 23
@@ -18,29 +17,18 @@ filePath = "/tmp/irrigate.out"
 # Initially off: initial_value=False
 # relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
 
-weather = Weather()
-
 # turn the relay on and off
 def irrigate():
-    precipitation = weather.precipitation()
-    yesterdayPrecipitation = weather.yesterdayPrecipitation()
-    print("T: " + str(precipitation), flush=True)
-    print("Y: " + str(yesterdayPrecipitation), flush=True)
-
     try:
         #print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
         #relay.on()
         fileStatus = ""
-        if (not weather.enoughPrecipitation()): 
-            print("on", flush=True)
-            fileStatus = "|| [Rain " + str(precipitation) + "] " + datetime.datetime.now().strftime(dt_format)
-            time.sleep(duration)
-            print("off", flush=True)
+        print("on", flush=True)
+        fileStatus = "|| " + datetime.datetime.now().strftime(dt_format)
+        time.sleep(duration)
+        print("off", flush=True)
             #print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format))
             #relay.off()
-        else:
-            print("rain probability", flush=True)
-            fileStatus = "|| [Rain " + str(precipitation) + "] " + datetime.datetime.now().strftime(dt_format)
         file = open(filePath, "a")
         file.write(fileStatus + "\n")
         file.close()          
