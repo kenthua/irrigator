@@ -4,7 +4,6 @@ import time
 import datetime
 import os
 import json
-from weather import *
 
 dt_format = "%Y-%m-%d %H:%M:%S"
 RELAY_PIN = 23
@@ -12,8 +11,6 @@ status = ""
 filePath = "/tmp/irrigate.out"
 
 relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
-
-weather = Weather()
 
 app = Flask(__name__)
 
@@ -40,12 +37,7 @@ def index():
         status = ""
         output = {
             "status": str(relay.value),
-            "history": "",
-            "weather": {
-                "precipitation": weather.precipitation(),
-                "yesterdayPrecipitation": weather.yesterdayPrecipitation(),
-                "enoughPrecipitation": weather.enoughPrecipitation()
-            }
+            "history": ""
         }
 
         if request.method == 'POST':

@@ -4,7 +4,6 @@ import time
 import datetime
 import os
 import json
-from weather import *
 
 dt_format = "%Y-%m-%d %H:%M:%S"
 RELAY_PIN = 23
@@ -12,8 +11,6 @@ status = ""
 filePath = "/tmp/irrigate.out"
 
 # relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
-
-weather = Weather()
 
 app = Flask(__name__)
 
@@ -41,11 +38,7 @@ def index():
 
     output = {
         "status": "0",
-        "weather": {
-            "precipitation": weather.precipitation(),
-            "yesterdayPrecipitation": weather.yesterdayPrecipitation(),
-            "enoughPrecipitation": weather.enoughPrecipitation()            
-        }
+        "history": ""        
     }
     
     if request.method == 'POST':
@@ -73,8 +66,7 @@ def index():
     # except GPIOZeroError:
     #     print('A GPIO Zero error occurred')
         # relay.off()
-
-
+    # return render_template("index.html", output=output)
 
 if __name__ == "__main__":
    app.run(host='0.0.0.0', port=8080, debug=False)
