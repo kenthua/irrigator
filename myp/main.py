@@ -21,24 +21,27 @@ topic_pub = bytes(config.MQTT_TOPIC, "utf-8")
 json_message = {}
 
 def irrigate():  # Demonstrate callback
+    client = MQTTClient(client_id, mqtt_server)
     try:
         print("value: 0")
         relay.value(0)
-        client = MQTTClient(client_id, mqtt_server)
         client.connect()
         json_message.update({"type": "irrigator"})
         json_message.update({"relay_value": str(relay.value())})
         json_message.update({"timestamp": str(time.localtime())})
-        #message = "Irrigator: [" + str(relay.value()) + "]: " + str(time.localtime())
         client.publish(topic_pub, json.dumps(json_message), retain=True)
-        client.disconnect()    
         time.sleep_ms(config.DURATION)
         print("value: 1")
         relay.value(1)
+        json_message.update({"relay_value": str(relay.value())})
+        json_message.update({"timestamp": str(time.localtime())})
+        client.publish(topic_pub, json.dumps(json_message), retain=True)
+        client.disconnect()    
     except OSError as e:
         print("Failed")
         time.sleep(2)
         machine.reset()
+        client.disconnect()    
 
 async def main():
     print("Begin scheduling...")
@@ -54,7 +57,7 @@ async def main():
     asyncio.create_task(schedule(seq, 'irrigate', wday=1, hrs=14, mins=00))
     asyncio.create_task(schedule(seq, 'irrigate', wday=3, hrs=14, mins=00))
     # test
-    #asyncio.create_task(schedule(seq, 'irrigate', wday=2, hrs=02, mins=09))
+    #asyncio.create_task(schedule(seq, 'irrigate', wday=4, hrs=02, mins=44))
     print("Scheduled")
     async for args in seq:
         irrigate()
@@ -63,4 +66,5 @@ try:
     asyncio.run(main())
 finally:
     asyncio.new_event_loop()
+
 
