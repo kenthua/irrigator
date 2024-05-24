@@ -29,12 +29,14 @@ def irrigate():  # Demonstrate callback
         json_message.update({"type": "irrigator"})
         json_message.update({"relay_value": str(relay.value())})
         json_message.update({"timestamp": str(time.localtime())})
+        json_message.update({"device_id": config.DEVICE_ID})
         client.publish(topic_pub, json.dumps(json_message), retain=True)
         time.sleep_ms(config.DURATION)
         print("value: 0")
         relay.value(0)
         json_message.update({"relay_value": str(relay.value())})
         json_message.update({"timestamp": str(time.localtime())})
+        json_message.update({"device_id": config.DEVICE_ID})
         client.publish(topic_pub, json.dumps(json_message), retain=True)
         client.disconnect()    
     except OSError as e:
@@ -66,3 +68,5 @@ try:
     asyncio.run(main())
 finally:
     asyncio.new_event_loop()
+
+
