@@ -19,9 +19,9 @@ mqtt_server = config.MQTT_SERVER
 client_id = ubinascii.hexlify(machine.unique_id())
 topic_pub = bytes(config.MQTT_TOPIC, "utf-8")
 json_message = {}
+client = MQTTClient(client_id, mqtt_server)
 
 def irrigate():  # Demonstrate callback
-    client = MQTTClient(client_id, mqtt_server)
     try:
         print("value: 0")
         relay.value(0)
@@ -36,19 +36,32 @@ def irrigate():  # Demonstrate callback
         relay.value(1)
         json_message.update({"relay_value": str(relay.value())})
         json_message.update({"timestamp": str(time.localtime())})
-        json_message.update({"device_id": config.DEVICE_ID})
         client.publish(topic_pub, json.dumps(json_message), retain=True)
         client.disconnect()    
     except OSError as e:
-        print("Failed")
+        print("Irrigate Failed")
         time.sleep(2)
-        machine.reset()
         client.disconnect()    
+        machine.reset()
 
 async def main():
     print("Begin scheduling...")
-    print("Set relay to 1, to turn off")
-    relay.value(1)
+    try: 
+        print("Set relay to 1, to turn off")
+        client.connect()
+        json_message.update({"type": "irrigator"})
+        json_message.update({"relay_value": str("2")})
+        json_message.update({"timestamp": str(time.localtime())})
+        json_message.update({"device_id": config.DEVICE_ID})
+        client.publish(topic_pub, json.dumps(json_message), retain=True)
+        relay.value(1)
+        client.disconnect()    
+    except OSError as e:
+        print("Main Failed")
+        time.sleep(2)
+        client.disconnect()    
+        machine.reset()
+        
     print("Set machine freq")
     machine.freq(config.MACHINE_FREQ)
     print("Machine freq: " + str(machine.freq()))
