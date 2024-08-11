@@ -18,25 +18,29 @@ relay = Pin(1,Pin.OUT)
 mqtt_server = config.MQTT_SERVER
 client_id = ubinascii.hexlify(machine.unique_id())
 topic_pub = bytes(config.MQTT_TOPIC, "utf-8")
-json_message = {}
+#json_message = {}
 client = MQTTClient(client_id, mqtt_server)
+
+def prepareMessage(relay_state):
+    json_message = {}
+    json_message.update({"type": "irrigator"})
+    json_message.update({"relay_value": str(relay_state)})
+    json_message.update({"timestamp": str(time.localtime())})
+    json_message.update({"device_id": config.DEVICE_ID})    
+    return json_message
 
 def irrigate():  # Demonstrate callback
     try:
         print("value: 0")
         relay.value(0)
         client.connect()
-        json_message.update({"type": "irrigator"})
-        json_message.update({"relay_value": str(relay.value())})
-        json_message.update({"timestamp": str(time.localtime())})
-        json_message.update({"device_id": config.DEVICE_ID})
-        client.publish(topic_pub, json.dumps(json_message), retain=True)
+        _json_message = prepareMessage(relay.value())
+        client.publish(topic_pub, json.dumps(_json_message), retain=True)
         time.sleep_ms(config.DURATION)
         print("value: 1")
         relay.value(1)
-        json_message.update({"relay_value": str(relay.value())})
-        json_message.update({"timestamp": str(time.localtime())})
-        client.publish(topic_pub, json.dumps(json_message), retain=True)
+        _json_message = prepareMessage(relay.value())
+        client.publish(topic_pub, json.dumps(_json_message), retain=True)
         client.disconnect()    
     except OSError as e:
         print("Irrigate Failed")
@@ -49,11 +53,8 @@ async def main():
     try: 
         print("Set relay to 1, to turn off")
         client.connect()
-        json_message.update({"type": "irrigator"})
-        json_message.update({"relay_value": str("2")})
-        json_message.update({"timestamp": str(time.localtime())})
-        json_message.update({"device_id": config.DEVICE_ID})
-        client.publish(topic_pub, json.dumps(json_message), retain=True)
+        _json_message = prepareMessage(relay.value())
+        client.publish(topic_pub, json.dumps(_json_message), retain=True)
         relay.value(1)
         client.disconnect()    
     except OSError as e:
