@@ -14,7 +14,7 @@ from umqtt.simple2 import MQTTClient
 import ubinascii
 import machine
 
-relay = Pin(1,Pin.OUT)
+relay = Pin(config.RELAY_PIN, Pin.OUT)
 mqtt_server = config.MQTT_SERVER
 client_id = ubinascii.hexlify(machine.unique_id())
 topic_pub = bytes(config.MQTT_TOPIC, "utf-8")
@@ -31,17 +31,17 @@ def prepareMessage(relay_state):
 
 def irrigate():  # Demonstrate callback
     try:
-        print("value: 0")
-        relay.value(0)
+        print(f"value: {config.RELAY_ON}")
+        relay.value(config.RELAY_ON)
         client.connect()
         _json_message = prepareMessage(relay.value())
         client.publish(topic_pub, json.dumps(_json_message), retain=True)
         time.sleep_ms(config.DURATION)
-        print("value: 1")
-        relay.value(1)
+        print(f"value: {config.RELAY_OFF}")
+        relay.value(config.RELAY_OFF)
         _json_message = prepareMessage(relay.value())
         client.publish(topic_pub, json.dumps(_json_message), retain=True)
-        client.disconnect()    
+        client.disconnect()
     except OSError as e:
         print("Irrigate Failed")
         time.sleep(2)
@@ -50,12 +50,13 @@ def irrigate():  # Demonstrate callback
 
 async def main():
     print("Begin scheduling...")
+    print(f"Relay Pin Configured to: {config.RELAY_PIN}")
     try: 
-        print("Set relay to 1, to turn off")
+        print(f"Set relay to off: {config.RELAY_OFF}")
         client.connect()
-        _json_message = prepareMessage(relay.value())
+        _json_message = prepareMessage(config.RELAY_INIT)
         client.publish(topic_pub, json.dumps(_json_message), retain=True)
-        relay.value(1)
+        relay.value(config.RELAY_OFF)
         client.disconnect()    
     except OSError as e:
         print("Main Failed")
@@ -73,7 +74,7 @@ async def main():
     asyncio.create_task(schedule(seq, 'irrigate', wday=1, hrs=14, mins=00))
     asyncio.create_task(schedule(seq, 'irrigate', wday=3, hrs=14, mins=00))
     # test
-    #asyncio.create_task(schedule(seq, 'irrigate', wday=1, hrs=23, mins=52))
+    asyncio.create_task(schedule(seq, 'irrigate', wday=6, hrs=17, mins=51))
     print("Scheduled")
     async for args in seq:
         irrigate()
