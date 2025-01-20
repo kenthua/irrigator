@@ -29,7 +29,7 @@ fi
 # create sym-link to run script in deamon
 if [ ! -L /service/$SERVICE_NAME ]; then
     echo "Creating service..."
-    ln -s $SCRIPT_DIR/app/service /service/$SERVICE_NAME
+    ln -s $SCRIPT_DIR/service /service/$SERVICE_NAME
 else
     echo "Service already exists."
 fi
