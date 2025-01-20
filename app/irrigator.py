@@ -4,7 +4,7 @@ import schedule
 import datetime
 
 #RELAY_PIN = "BOARD16"
-RELAY_PIN = 23
+RELAY_PIN = 2
 time1 = "07:00:00"
 time2 = "20:30:00"
 time3 = "03:08:10"
@@ -12,9 +12,9 @@ duration = 45
 dt_format = "%Y-%m-%d %H:%M:%S"
 filePath = "/tmp/irrigate.out"
 
-# Triggered by the output pin going high: active_hgh=False
+# Triggered by the output pin going high: active_hugh=True (for single relay, False for 4xrelay)
 # Initially off: initial_value=False
-relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
+relay = gpiozero.OutputDevice(RELAY_PIN, active_high=True, initial_value=False)
 
 # turn the relay on and off
 def irrigate():
