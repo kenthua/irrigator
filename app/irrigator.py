@@ -3,6 +3,8 @@ import time
 import schedule
 import datetime
 
+from gpiozero import GPIOZeroError
+
 #RELAY_PIN = "BOARD16"
 RELAY_PIN = 2
 time1 = "07:00:00"
