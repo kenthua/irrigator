@@ -7,10 +7,10 @@ from gpiozero import GPIOZeroError
 
 #RELAY_PIN = "BOARD16"
 RELAY_PIN = 2
-time1 = "07:00:00"
+time1 = "17:30:00"
 time2 = "20:30:00"
 time3 = "03:08:10"
-duration = 45
+duration = 20
 dt_format = "%Y-%m-%d %H:%M:%S"
 filePath = "/tmp/irrigate.out"
 
@@ -37,9 +37,9 @@ def irrigate():
         relay.off()
     
 # set the schedule
-schedule.every().monday.at(time1).do(irrigate)
-schedule.every().wednesday.at(time1).do(irrigate)
-schedule.every().friday.at(time1).do(irrigate)
+schedule.every().tuesday.at(time1).do(irrigate)
+schedule.every().thursday.at(time1).do(irrigate)
+#schedule.every().friday.at(time1).do(irrigate)
 #schedule.every().saturday.at(time1).do(irrigate)
 
 while True:
