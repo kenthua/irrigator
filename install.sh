@@ -32,6 +32,7 @@ CONVERSIONS_SCRIPT_FILE=/usr/lib/python3.8/site-packages/colorzero/conversions.p
 sed -i -e 's/^import colorsys/#import colorsys/' $CONVERSIONS_SCRIPT_FILE
 
 # check relay
+echo "Check relay config"
 STRING_CHECK=relay_2
 GPIO_FILE=/etc/venus/gpio_list
 
