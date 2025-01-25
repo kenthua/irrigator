@@ -26,6 +26,21 @@ then
     fi
 fi
 
+# update import
+echo "Comment colorsys from conversions"
+CONVERSIONS_SCRIPT_FILE=/usr/lib/python3.8/site-packages/colorzero/conversions.py
+sed -i -e 's/^import colorsys/#import colorsys/' $CONVERSIONS_SCRIPT_FILE
+
+# check relay
+STRING_CHECK=relay_2
+GPIO_FILE=/etc/venus/gpio_list
+
+if [[ -z $(grep "$STRING_CHECK" "$GPIO_FILE") ]];
+then
+	echo "Relay missing..."
+	echo "2 out relay_2" >> $GPIO_FILE; 
+fi
+
 # create sym-link to run script in deamon
 if [ ! -L /service/$SERVICE_NAME ]; then
     echo "Creating service..."
