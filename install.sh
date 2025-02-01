@@ -17,12 +17,12 @@ python -c "import gpiozero"
 if [ $? -gt 0 ]
 then
     echo "Installing requirements..."
-    python -m pip install -r requirements.txt
+    python -m pip install -r $SCRIPT_DIR/requirements.txt
     if [ $? -gt 0 ]
     then
         # if pip command fails install pip and then try again
         opkg update && opkg install python3-pip
-        python -m pip install -r requirements.txt
+        python -m pip install -r $SCRIPT_DIR/requirements.txt
     fi
 fi
 
