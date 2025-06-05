@@ -9,17 +9,11 @@ from gpiozero import GPIOZeroError
 RELAY_PIN = 2
 time1 = "17:30:00"
 time2 = "20:30:00"
-time3 = "03:08:10"
+time3 = "04:06:00"
 duration = 20
 dt_format = "%Y-%m-%d %H:%M:%S"
 filePath = "/tmp/irrigate.out"
 
-# Triggered by the output pin going high: active_hugh=True (for single relay, False for 4xrelay)
-# Initially off: initial_value=False
-relay = gpiozero.OutputDevice(RELAY_PIN, active_high=True, initial_value=False)
-
-
-# turn the relay on and off
 def irrigate(duration, relay):
     try:
         fileStatus = ""
@@ -51,6 +45,10 @@ def irrigate(duration, relay):
 
 
 if __name__ == "__main__":
+
+    # Triggered by the output pin going high: active_hugh=True (for single relay, False for 4xrelay)
+    # Initially off: initial_value=False
+    relay = gpiozero.OutputDevice(RELAY_PIN, active_high=True, initial_value=False)
 
     # set the schedule
     schedule.every().tuesday.at(time1).do(irrigate, duration, relay)
