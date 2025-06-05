@@ -57,6 +57,5 @@ if __name__ == "__main__":
     # schedule.every().saturday.at(time1).do(irrigate)
 
     while True:
-        print("start in irrigate")
         schedule.run_pending()
         time.sleep(1)
