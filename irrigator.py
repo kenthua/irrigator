@@ -53,8 +53,8 @@ def irrigate(duration, relay):
 if __name__ == "__main__":
 
     # set the schedule
-    schedule.every().tuesday.at(time1).do(irrigate(duration, relay))
-    schedule.every().thursday.at(time1).do(irrigate(duration, relay))
+    schedule.every().tuesday.at(time1).do(irrigate, duration, relay)
+    schedule.every().thursday.at(time1).do(irrigate, duration, relay)
     # schedule.every().friday.at(time1).do(irrigate)
     # schedule.every().saturday.at(time1).do(irrigate)
 
