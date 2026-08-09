@@ -42,29 +42,67 @@ Transition the `irrigator` service from legacy `gpiozero` hardware calls to Vict
 
 ---
 
-## Verification Plan
+## Verification & Manual Testing Plan
 
-### Automated Unit Tests
-Run local unit test suite on the new branch:
+### 1. Automated Unit Tests
+Run local unit test suite on the repository branch:
 ```bash
 python3 -m unittest test_irrigator.py
 ```
 
-### Remote Verification on Venus OS 3.55 (`192.168.4.74`)
-1. Pull `upgrade-v3.72` branch on Venus OS:
+---
+
+### 2. Manual DBus Testing Commands (On Venus OS)
+
+Run these commands directly over SSH on your Venus OS device (`root@<VENUS-IP>`):
+
+#### **A. Query Current Relay 2 State**
+```bash
+python3 -c "import dbus; bus=dbus.SystemBus(); print('Relay 2 State:', bus.get_object('com.victronenergy.system', '/Relay/1/State').GetValue())"
+```
+
+#### **B. Manual Relay ON (Toggle High)**
+```bash
+python3 -c "import dbus; bus=dbus.SystemBus(); bus.get_object('com.victronenergy.system', '/Relay/1/State').SetValue(dbus.Int32(1))"
+```
+
+#### **C. Manual Relay OFF (Toggle Low)**
+```bash
+python3 -c "import dbus; bus=dbus.SystemBus(); bus.get_object('com.victronenergy.system', '/Relay/1/State').SetValue(dbus.Int32(0))"
+```
+
+#### **D. Run 5-Second One-Shot Irrigation Test Script**
+```bash
+python3 -c "from irrigator import VenusRelay, irrigate; relay = VenusRelay(1); irrigate(5, relay)"
+```
+
+#### **E. Check Output & Service Logs**
+```bash
+# View irrigation trigger log file
+cat /tmp/irrigate.out
+
+# View daemon service log stream
+tail -f /var/log/irrigator/current
+```
+
+---
+
+### 3. Remote Service Deployment & Verification (Venus OS 3.55 & 3.72)
+
+1. **Pull `upgrade-v3.72` branch on Venus OS:**
    ```bash
    cd /data/etc/irrigator
    git fetch origin
    git checkout upgrade-v3.72
+   ```
+
+2. **Run installer script:**
+   ```bash
    bash install.sh
    ```
-2. Verify relay toggle via DBus:
-   ```bash
-   python3 -c "import dbus; bus=dbus.SystemBus(); print('Relay 2:', bus.get_object('com.victronenergy.system', '/Relay/1/State').GetValue())"
-   ```
-3. Restart service and check status:
+
+3. **Restart service and verify active status:**
    ```bash
    ./restart.sh
    svstat /service/irrigator
-   tail -n 20 /var/log/irrigator/current
    ```
