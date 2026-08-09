@@ -1,5 +1,4 @@
 #!/bin/sh
 echo "*** starting irrigator ***"
 exec 2>&1
-exec python /data/etc/irrigator/irrigator.py
-
+exec python3 /data/etc/irrigator/irrigator.py

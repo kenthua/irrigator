@@ -1,59 +1,58 @@
 import unittest
 from unittest.mock import patch, MagicMock
-import time
-from irrigator import RELAY_PIN
-from irrigator import irrigate
+import sys
 
-# Assuming irrigator.py has the following structure
-# from gpiozero import OutputDevice
-# import time
-#
-# class MockOutputDevice:
-#     def __init__(self, pin):
-#         self.pin = pin
-#         self.is_active = False
-#         self.toggled_count = 0
-#
-#     def on(self):
-#         self.is_active = True
-#         self.toggled_count += 1
-#
-#     def off(self):
-#         self.is_active = False
-#         self.toggled_count += 1
-#
-# def irrigate(duration, relay_pin):
-#     relay = MockOutputDevice(relay_pin) # Use MockOutputDevice here for direct testing
-#     print(f"Turning on relay {relay_pin} for {duration} seconds")
-#     relay.on()
-#     time.sleep(duration)
-#     relay.off()
-#     print(f"Turning off relay {relay_pin}")
+# Mock schedule if not installed locally
+if 'schedule' not in sys.modules:
+    sys.modules['schedule'] = MagicMock()
+
+from irrigator import irrigate, VenusRelay
+
 
 class TestIrrigator(unittest.TestCase):
 
-    @patch('gpiozero.OutputDevice')
-    def test_irrigate_function(self, MockOutputDevice):
-        # Mock the instance of OutputDevice
-        mock_relay_instance = MagicMock()
-        mock_relay_instance.value = 0  # Configure the mock relay instance to have a 'value' attribute
-        MockOutputDevice.return_value = mock_relay_instance
+    def test_irrigate_function(self):
+        mock_relay = MagicMock()
+        mock_relay.value = 0
 
         duration = 5
-        # We don't need relay_pin here as we are passing the mock instance
 
-        with patch('time.sleep') as mock_sleep:
-            # Call the function we are testing
-            irrigate(duration, mock_relay_instance)
+        with patch("time.sleep") as mock_sleep:
+            irrigate(duration, mock_relay)
 
-            # Assertions
-            mock_relay_instance.on.assert_called_once()
-
-            # Check if time.sleep was called with the correct duration
+            mock_relay.on.assert_called_once()
             mock_sleep.assert_called_once_with(duration)
+            mock_relay.off.assert_called_once()
 
-            # Check if off() was called on the mocked relay instance
-            mock_relay_instance.off.assert_called_once()
+    @patch("dbus.SystemBus")
+    def test_venus_relay_dbus(self, mock_system_bus):
+        mock_bus_instance = MagicMock()
+        mock_obj = MagicMock()
+        mock_iface = MagicMock()
+        mock_iface.GetValue.return_value = 0
 
-if __name__ == '__main__':
+        mock_system_bus.return_value = mock_bus_instance
+        mock_bus_instance.get_object.return_value = mock_obj
+
+        # Mock dbus module in sys.modules if needed
+        mock_dbus = MagicMock()
+        mock_dbus.SystemBus = mock_system_bus
+        mock_dbus.Interface.return_value = mock_iface
+        mock_dbus.Int32 = lambda x: x
+
+        with patch.dict("sys.modules", {"dbus": mock_dbus}):
+            relay = VenusRelay(relay_index=1)
+            relay.use_dbus = True
+            relay.iface = mock_iface
+
+            relay.on()
+            mock_iface.SetValue.assert_called_with(1)
+
+            relay.off()
+            mock_iface.SetValue.assert_called_with(0)
+
+            self.assertEqual(relay.value, 0)
+
+
+if __name__ == "__main__":
     unittest.main()
