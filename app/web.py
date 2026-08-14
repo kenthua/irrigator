@@ -1,24 +1,27 @@
 from flask import Flask, render_template, request
-import gpiozero
 import time
 import datetime
 import os
 import json
+import sys
+
+# Import VenusRelay from root directory
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from irrigator import VenusRelay
 
 dt_format = "%Y-%m-%d %H:%M:%S"
-RELAY_PIN = 23
-status = ""
 filePath = "/tmp/irrigate.out"
 
-relay = gpiozero.OutputDevice(RELAY_PIN, active_high=False, initial_value=False)
+# Relay 2 (index 1) via DBus / sysfs fallback
+relay = VenusRelay(relay_index=1)
 
 app = Flask(__name__)
 
 @app.route("/api", methods=['GET'])
 def api():
     json_output = {}
-    if(os.path.isfile(filePath)):
-        file = open("/tmp/irrigate.out", "r")
+    if os.path.isfile(filePath):
+        file = open(filePath, "r")
         history = file.read()
         file.close()
         history_list = history.split("|| ")
@@ -41,31 +44,31 @@ def index():
         }
 
         if request.method == 'POST':
-            if request.form['i-action']  == 'on':
+            if request.form.get('i-action') == 'on':
                 relay.on()
-                output.update(status = "on")
+                output.update(status="on")
                 print("water on " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
-            elif request.form['i-action']  == 'off':
+            elif request.form.get('i-action') == 'off':
                 relay.off()
-                output.update(status = "off")
+                output.update(status="off")
                 print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
             else:
                 relay.off()
-                output.update(status = "off")
+                output.update(status="off")
                 print("water off " + str(relay.value) + " " + datetime.datetime.now().strftime(dt_format), flush=True)
         elif request.method == 'GET':
-            if(os.path.isfile(filePath)):
-                file = open("/tmp/irrigate.out", "r")
-                output.update(history = file.read())
+            if os.path.isfile(filePath):
+                file = open(filePath, "r")
+                output.update(history=file.read())
                 file.close()
 
             return render_template('index.html', output=output)
         return render_template("index.html", output=output)
-    except GPIOZeroError:
-        print('A GPIO Zero error occurred', flush=True)
+    except Exception as e:
+        print(f"Error in web interface: {e}", flush=True)
         relay.off()
 
     return render_template("index.html", output=output)
 
 if __name__ == "__main__":
-   app.run(host='0.0.0.0', port=8080, debug=False)
+    app.run(host='0.0.0.0', port=8080, debug=False)
