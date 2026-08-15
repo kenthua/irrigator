@@ -11,7 +11,7 @@ from irrigator import irrigate, VenusRelay
 
 class TestIrrigator(unittest.TestCase):
 
-    def test_irrigate_function(self):
+    def test_irrigate_normal_flow(self):
         mock_relay = MagicMock()
         mock_relay.value = 0
 
@@ -24,6 +24,20 @@ class TestIrrigator(unittest.TestCase):
             mock_sleep.assert_called_once_with(duration)
             mock_relay.off.assert_called_once()
 
+    def test_irrigate_exception_failsafe(self):
+        """Verifies that relay.off() is guaranteed to run even if an exception occurs during time.sleep()."""
+        mock_relay = MagicMock()
+        mock_relay.value = 0
+
+        duration = 5
+
+        with patch("time.sleep", side_effect=RuntimeError("Simulated Sleep Interruption")):
+            irrigate(duration, mock_relay)
+
+            mock_relay.on.assert_called_once()
+            # Crucial assertion: off() MUST be called via finally block despite exception
+            mock_relay.off.assert_called_once()
+
     @patch("dbus.SystemBus")
     def test_venus_relay_dbus(self, mock_system_bus):
         mock_bus_instance = MagicMock()
@@ -34,7 +48,6 @@ class TestIrrigator(unittest.TestCase):
         mock_system_bus.return_value = mock_bus_instance
         mock_bus_instance.get_object.return_value = mock_obj
 
-        # Mock dbus module in sys.modules if needed
         mock_dbus = MagicMock()
         mock_dbus.SystemBus = mock_system_bus
         mock_dbus.Interface.return_value = mock_iface

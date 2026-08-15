@@ -65,33 +65,31 @@ dt_format = "%Y-%m-%d %H:%M:%S"
 filePath = "/tmp/irrigate.out"
 
 
-def irrigate(duration, relay):
-    try:
-        fileStatus = ""
-        print(
-            "water on "
-            + str(relay.value)
-            + " "
-            + datetime.datetime.now().strftime(dt_format),
-            flush=True,
-        )
-        relay.on()
-        fileStatus = "|| " + datetime.datetime.now().strftime(dt_format)
-        time.sleep(duration)
-        print(
-            "water off "
-            + str(relay.value)
-            + " "
-            + datetime.datetime.now().strftime(dt_format),
-            flush=True,
-        )
-        relay.off()
+def get_timestamp():
+    return datetime.datetime.now().strftime(dt_format)
 
-        with open(filePath, "a") as f:
-            f.write(fileStatus + "\n")
+
+def irrigate(duration, relay):
+    """Executes a timed irrigation cycle safely, ensuring the relay turns off under all circumstances."""
+    print(f"[{get_timestamp()}] WATER ON | Relay State: {relay.value}", flush=True)
+
+    try:
+        relay.on()
+        time.sleep(duration)
     except Exception as e:
-        print(f"Error during irrigation execution: {e}", flush=True)
+        print(f"[{get_timestamp()}] ERROR during irrigation: {e}", flush=True)
+    finally:
+        # Guarantee relay is shut off regardless of any errors or interrupts
         relay.off()
+        end_time = get_timestamp()
+        print(f"[{end_time}] WATER OFF | Relay State: {relay.value}", flush=True)
+
+        # Log completion record for Web UI history
+        try:
+            with open(filePath, "a") as f:
+                f.write(f"|| {end_time}\n")
+        except IOError as err:
+            print(f"[{end_time}] Failed to write log history to {filePath}: {err}", flush=True)
 
 
 if __name__ == "__main__":
